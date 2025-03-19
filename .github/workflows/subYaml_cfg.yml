@@ -1,0 +1,17 @@
+name: Parse Config
+on:
+  workflow_call:
+    outputs:
+      runner_env:
+        value: ${{ steps.parse-config.outputs.runner_env }}
+jobs:
+  parse-config:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Parse config
+        id: parse-config
+        run: |
+          RUNNER_ENV=$(yq e '.runner_env' cross_config.yml)
+          echo "runner_env=$RUNNER_ENV" >> $GITHUB_OUTPUT    

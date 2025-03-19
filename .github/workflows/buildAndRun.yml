@@ -1,0 +1,23 @@
+name: Build and Run
+on:
+  workflow_dispatch:
+jobs:
+  get-runner-env:
+    uses: ./.github/workflows/subYaml_cfg.yml
+    outputs:
+      runner_env: ${{ jobs.parse-config.outputs.runner_env }}
+  build-and-run:
+    needs: get-runner-env
+    runs-on: ${{ needs.get-runner-env.outputs.runner_env == 'action' && 'ubuntu-22.04' || (needs.get-runner-env.outputs.runner_env == 'act' && 'ubuntu-22.04' || 'self-hosted') }}
+    steps:
+      - name: Checkout code
+        if: needs.get-runner-env.outputs.runner_env != 'act-local'
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: ./build.sh
+      - name: Run server
+        run: ./run.sh    
